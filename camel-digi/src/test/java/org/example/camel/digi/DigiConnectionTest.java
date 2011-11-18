@@ -24,32 +24,48 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class DigiConnectionTest extends CamelSpringTestSupport{
     @Override
-	protected ClassPathXmlApplicationContext createApplicationContext() {
+    protected ClassPathXmlApplicationContext createApplicationContext() {
         return new ClassPathXmlApplicationContext("META-INF/spring/camel-context.xml");
     }
 
     @Test
     public void testDigiRequest() throws Exception {
-    	// are we producing the correct requests
-    	Object reply = template.requestBody("{{digi.prepare-request}}", "localhost:9900");
+        // are we producing the correct requests
+        Object reply = template.requestBody("{{digi.prepare-request}}", "localhost:9900");
 
-    	assertNotNull(reply);
-    	assert(reply instanceof String);
-    	assertEquals(DigiRequest.REQUEST, reply);
+        assertNotNull(reply);
+        assert(reply instanceof String);
+        assertEquals(DigiRequest.REQUEST, reply);
     }
 
     @Test
-    public void testPingDigi() throws Exception {
-    	MockEndpoint mock = null;
-    	Endpoint reply = getMandatoryEndpoint("{{digi.reply}}");
-    	if (reply instanceof MockEndpoint) {
-    		mock = (MockEndpoint)reply;
-    		mock.expectedBodiesReceived(DigiMockRouteBuilder.DIGI_REPLY);
-    	}
-    	template.sendBody("seda:digi", "localhost:9900"); // use one mock digi at random
-    	
-    	if (mock != null) {
-    		mock.assertIsSatisfied();
-    	}
+    public void testDigiPingOne() throws Exception {
+        MockEndpoint mock = null;
+        Endpoint reply = getMandatoryEndpoint("{{digi.reply}}");
+        if (reply instanceof MockEndpoint) {
+            mock = (MockEndpoint)reply;
+            mock.expectedBodiesReceived(DigiMockRouteBuilder.DIGI_REPLY);
+        }
+        template.sendBody("seda:digi", "localhost:9900"); // use one mock digi at random
+
+        if (mock != null) {
+            mock.assertIsSatisfied();
+        }
+    }
+
+    @Test
+    public void testDigiPingAll() throws Exception {
+        MockEndpoint mock = null;
+        Endpoint reply = getMandatoryEndpoint("{{digi.reply}}");
+        if (reply instanceof MockEndpoint) {
+            mock = (MockEndpoint)reply;
+            mock.expectedMessageCount(6);
+        }
+
+        template.sendBody("{{digi.schedule-ping}}", ""); // no body, only need a trigger
+
+        if (mock != null) {
+            mock.assertIsSatisfied();
+        }
     }
 }

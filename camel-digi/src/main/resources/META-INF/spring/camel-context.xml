@@ -59,7 +59,7 @@
 
     <route id="digi-message">
       <from uri="direct:digi-request" />
-      <bean ref="digi" />
+      <bean ref="digi" method="prepare" />
     </route>
 
     <route id="mock-message">
