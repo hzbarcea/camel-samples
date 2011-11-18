@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements.  See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to You under the Apache License, Version 2.0
+    (the "License"); you may not use this file except in compliance with
+    the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+
+<!-- Configures the Camel Context-->
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+  <bean id="properties" class="org.apache.camel.component.properties.PropertiesComponent">
+    <property name="location" value="classpath:digi.properties"/>
+  </bean>
+
+  <camelContext trace="true" xmlns="http://camel.apache.org/schema/spring">
+    <package>org.example.camel.digi</package>
+
+    <!-- Fetch all the digis hostname/ip from a database (file)
+         split into records (digi host) and forward to a 
+         ping-digi service (implemented as a seda route) -->
+    <route id="ping-all" autoStartup="true">
+      <from uri="{{digi.schedule-ping}}" />
+      <pollEnrich uri="{{digi.uris-db}}" />
+      <to uri="log:DIGIS" />
+      <split>
+        <tokenize token="\n"/>
+        <to uri="log:DIGI" />
+        <to uri="seda:digi" />
+      </split>
+    </route>
+
+    <!-- Ping digis, one at a time -->
+    <route id="ping-digi">
+      <from uri="seda:digi" />
+      <to uri="log:DIGI" />
+      <setHeader headerName="DigiAddress"><simple>netty:tcp://${body}?sync=true</simple></setHeader>
+      <setBody><simple>${header.DigiAddres}</simple></setBody>
+      <to uri="log:DIGI" />
+      <setBody><constant>C0 80 05 00 54 72 C0 C0 80 05 00 54 72 C0</constant></setBody>
+      <routingSlip><header>DigiAddress</header></routingSlip>
+      <to uri="{{digi.results}}" />
+    </route>
+  </camelContext>
+
+</beans>
