@@ -29,6 +29,8 @@
     <property name="location" value="classpath:digi.properties"/>
   </bean>
 
+  <bean id="digi" class="org.example.camel.digi.DigiRequest" scope="singleton"/>
+
   <camelContext trace="true" xmlns="http://camel.apache.org/schema/spring">
     <package>org.example.camel.digi</package>
 
@@ -41,7 +43,6 @@
       <to uri="log:DIGIS" />
       <split>
         <tokenize token="\n"/>
-        <to uri="log:DIGI" />
         <to uri="seda:digi" />
       </split>
     </route>
@@ -49,13 +50,21 @@
     <!-- Ping digis, one at a time -->
     <route id="ping-digi">
       <from uri="seda:digi" />
-      <to uri="log:DIGI" />
-      <setHeader headerName="DigiAddress"><simple>netty:tcp://${body}?sync=true</simple></setHeader>
-      <setBody><simple>${header.DigiAddres}</simple></setBody>
-      <to uri="log:DIGI" />
+      <setHeader headerName="DigiId"><simple>${body}</simple></setHeader>
+      <setHeader headerName="DigiUri"><simple>netty:tcp://${body}?sync=true</simple></setHeader>
+      <to uri="{{digi.prepare-request}}" />
+      <routingSlip><header>DigiUri</header></routingSlip>
+      <to uri="{{digi.reply}}" />
+    </route>
+
+    <route id="digi-message">
+      <from uri="direct:digi-request" />
+      <bean ref="digi" />
+    </route>
+
+    <route id="mock-message">
+      <from uri="direct:mock-request" />
       <setBody><constant>C0 80 05 00 54 72 C0 C0 80 05 00 54 72 C0</constant></setBody>
-      <routingSlip><header>DigiAddress</header></routingSlip>
-      <to uri="{{digi.results}}" />
     </route>
   </camelContext>
 

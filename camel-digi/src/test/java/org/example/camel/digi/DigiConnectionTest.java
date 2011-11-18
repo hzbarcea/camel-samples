@@ -1,4 +1,3 @@
-package org.example.camel.digi;
 /**
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,7 +14,10 @@ package org.example.camel.digi;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.example.camel.digi;
 
+import org.apache.camel.Endpoint;
+import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit4.CamelSpringTestSupport;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -27,7 +29,27 @@ public class DigiConnectionTest extends CamelSpringTestSupport{
     }
 
     @Test
+    public void testDigiRequest() throws Exception {
+    	// are we producing the correct requests
+    	Object reply = template.requestBody("{{digi.prepare-request}}", "localhost:9900");
+
+    	assertNotNull(reply);
+    	assert(reply instanceof String);
+    	assertEquals(DigiRequest.REQUEST, reply);
+    }
+
+    @Test
     public void testPingDigi() throws Exception {
-    	template.sendBody("{{digi.schedule-ping}}", ""); // just need a trigger
+    	MockEndpoint mock = null;
+    	Endpoint reply = getMandatoryEndpoint("{{digi.reply}}");
+    	if (reply instanceof MockEndpoint) {
+    		mock = (MockEndpoint)reply;
+    		mock.expectedBodiesReceived(DigiMockRouteBuilder.DIGI_REPLY);
+    	}
+    	template.sendBody("seda:digi", "localhost:9900"); // use one mock digi at random
+    	
+    	if (mock != null) {
+    		mock.assertIsSatisfied();
+    	}
     }
 }
