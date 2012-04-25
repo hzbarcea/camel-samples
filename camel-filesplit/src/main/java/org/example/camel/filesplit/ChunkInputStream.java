@@ -26,42 +26,49 @@ import org.slf4j.LoggerFactory;
 public class ChunkInputStream extends BufferedInputStream {
     private static final Logger LOG = LoggerFactory.getLogger(ChunkInputStream.class);
 	private final long chunk;
-	private final long start;
+	private final int index;
+	private int bytesRead = 0;
 	private boolean advance = true;
 
 	public ChunkInputStream(InputStream in, long chunk, int index) {
 		super(in);
 		this.chunk = chunk;
-		this.start = chunk * index;
+		this.index = index;
 	}
 
 	public ChunkInputStream(InputStream in, int size, long chunk, int index) {
 		super(in, size);
 		this.chunk = chunk;
-		this.start = chunk * index;
+		this.index = index;
 	}
 
 	@Override
 	public synchronized int read() throws IOException {
 		step();
-		return super.read();
+		int result = bytesRead < chunk ? super.read() : -1;
+	    bytesRead += result == -1 ? 0 : 1; 
+		return bytesRead < chunk ? result : -1;
 	}
 
 	@Override
 	public synchronized int read(byte[] b, int off, int len) throws IOException {
 		step();
-		return super.read(b, off, len);
+		int result = bytesRead < chunk ? super.read(b, off, len) : -1;
+	    bytesRead += result == -1 ? 0 : result;
+		return bytesRead > chunk ? (int)(chunk + result - bytesRead) : result;
 	}
 
 	@Override
 	public int read(byte[] b) throws IOException {
 		step();
-		return super.read(b);
+		int result = bytesRead < chunk ? super.read(b) : -1;
+	    bytesRead += result == -1 ? 0 : result;
+		return bytesRead > chunk ? (int)(chunk + result - bytesRead) : result;
 	}
 
 	private void step() throws IOException {
 		if (advance) {
-			this.skip(start);
+			this.skip(chunk * index);
 			advance = false;
 		}
 	}

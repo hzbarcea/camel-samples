@@ -19,6 +19,7 @@ package org.example.camel.filesplit;
 import java.io.InputStream;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.Predicate;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
@@ -54,13 +55,23 @@ public class FileSplitRouteBuilder extends RouteBuilder {
     
     private void createRoute(String uri) {
     	from(uri)
+            .setHeader("ChunkStart", constant("true"))
     	    .convertBodyTo(InputStream.class)
             .split(body().tokenize("\n"))
-            .process(new Processor() {
-				@Override
-				public void process(Exchange exchange) throws Exception {
-					LOG.info("SPLIT: {}", exchange.getIn().getBody());
-				}
-            });
+                .filter(new Predicate() {
+					@Override
+					public boolean matches(Exchange exchange) {
+						// boolean first = "true".equals(exchange.getIn().getHeader("ChunkStart"));
+						// exchange.getIn().setHeader("ChunkStart", "false");
+						return true;
+					}
+                	
+                })
+	            .process(new Processor() {
+					@Override
+					public void process(Exchange exchange) throws Exception {
+						LOG.info("SPLIT: {}", exchange.getIn().getBody());
+					}
+	            });
     }
 }
