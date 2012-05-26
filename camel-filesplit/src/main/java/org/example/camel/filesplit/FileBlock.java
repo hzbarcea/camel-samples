@@ -18,14 +18,14 @@ package org.example.camel.filesplit;
 
 import org.apache.camel.component.file.GenericFile;
 
-public class InputChunk {
+public class FileBlock {
 	private final GenericFile<?> file;
-	private final long chunk;
+	private final long size;
 	private final int index;
 
-	public InputChunk(GenericFile<?> file, long chunk, int index) {
+	public FileBlock(GenericFile<?> file, long size, int index) {
 		this.file = file;
-		this.chunk = chunk;
+		this.size = size;
 		this.index = index;
 	}
 
@@ -34,7 +34,7 @@ public class InputChunk {
 	}
 
 	public long getChunk() {
-		return chunk;
+		return size;
 	}
 
 	public int getIndex() {

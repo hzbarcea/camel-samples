@@ -29,6 +29,8 @@
     <property name="location" value="classpath:filesplit.properties"/>
   </bean>
 
+  <bean id="splitCounter" class="org.example.camel.filesplit.SplitCounterProcessor" />
+
   <camelContext trace="true" xmlns="http://camel.apache.org/schema/spring">
     <package>org.example.camel.filesplit</package>
 

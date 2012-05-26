@@ -20,55 +20,52 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-public class ChunkInputStream extends BufferedInputStream {
-    private static final Logger LOG = LoggerFactory.getLogger(ChunkInputStream.class);
-	private final long chunk;
+public class BlockInputStream extends BufferedInputStream {
+	private final long blockSize;
 	private final int index;
-	private int bytesRead = 0;
 	private boolean advance = true;
 
-	public ChunkInputStream(InputStream in, long chunk, int index) {
+	public BlockInputStream(InputStream in, long blockSize, int index) {
 		super(in);
-		this.chunk = chunk;
+		this.blockSize = blockSize;
 		this.index = index;
 	}
 
-	public ChunkInputStream(InputStream in, int size, long chunk, int index) {
+	public BlockInputStream(InputStream in, int size, long blockSize, int index) {
 		super(in, size);
-		this.chunk = chunk;
+		this.blockSize = blockSize;
 		this.index = index;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public long getBlockSize() {
+		return blockSize;
 	}
 
 	@Override
 	public synchronized int read() throws IOException {
 		step();
-		int result = bytesRead < chunk ? super.read() : -1;
-	    bytesRead += result == -1 ? 0 : 1; 
-		return bytesRead < chunk ? result : -1;
+		return super.read();
 	}
 
 	@Override
 	public synchronized int read(byte[] b, int off, int len) throws IOException {
 		step();
-		int result = bytesRead < chunk ? super.read(b, off, len) : -1;
-	    bytesRead += result == -1 ? 0 : result;
-		return bytesRead > chunk ? (int)(chunk + result - bytesRead) : result;
+		return super.read(b, off, len);
 	}
 
 	@Override
 	public int read(byte[] b) throws IOException {
 		step();
-		int result = bytesRead < chunk ? super.read(b) : -1;
-	    bytesRead += result == -1 ? 0 : result;
-		return bytesRead > chunk ? (int)(chunk + result - bytesRead) : result;
+		return super.read(b);
 	}
 
-	private void step() throws IOException {
+	private synchronized void step() throws IOException {
 		if (advance) {
-			this.skip(chunk * index);
+			this.skip(blockSize * index);
 			advance = false;
 		}
 	}

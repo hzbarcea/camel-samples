@@ -16,6 +16,10 @@
  */
 package org.example.camel.filesplit;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.camel.component.properties.PropertiesComponent;
 import org.apache.camel.test.junit4.CamelSpringTestSupport;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -27,7 +31,27 @@ public class FileSplitTest extends CamelSpringTestSupport{
     }
 
     @Test
-    public void testFileSplitParallelProc() throws Exception {
-    	// file poller starts automatically
+    public void testFileSplitParallelProc() throws Exception {    	
+    	PropertiesComponent props = context.getRegistry().lookup("properties", PropertiesComponent.class);
+    	int count = Integer.parseInt(props.parseUri("{{demo.message.count}}"));
+    	CountDownLatch trigger = new CountDownLatch(count);
+
+    	SplitCounterProcessor splitCounter = context.getRegistry().lookup("splitCounter", SplitCounterProcessor.class);
+    	splitCounter.setCounter(trigger);
+    	
+    	// file poller starts automatically when the route starts
+    	// since we created the 'fetch' route with autoStartup=false
+    	// polling won't start until we start the route
+    	log.info("Expecting to process {} messages", count);
+    	context.startRoute("fetch");
+
+    	// set a timeout larger than the expected processing time
+    	int timeout = 10 * 1000;
+    	boolean success = trigger.await(timeout, TimeUnit.MILLISECONDS);
+    	long delta = success ? System.currentTimeMillis() - splitCounter.getTimeStarted() : timeout;
+    	String outcome = success ? "finished in" : "timed out after";
+    	log.info("Processing {} {} millis", outcome, delta);
+    	
+    	assertTrue(success);
     }
 }

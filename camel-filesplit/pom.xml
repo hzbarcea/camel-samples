@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-
     Licensed to the Apache Software Foundation (ASF) under one or more
     contributor license agreements.  See the NOTICE file distributed with
     this work for additional information regarding copyright ownership.
@@ -15,7 +14,6 @@
     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
     See the License for the specific language governing permissions and
     limitations under the License.
-
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -31,7 +29,7 @@
   <url>http://coders.talend.com</url>
 
   <properties>
-    <camel.version>2.8.2</camel.version>
+    <camel.version>2.10-SNAPSHOT</camel.version>
     <spring.version>3.0.6.RELEASE</spring.version>
 
     <log4j.version>1.2.16</log4j.version>
@@ -56,6 +54,11 @@
     <dependency>
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-netty</artifactId>
+      <version>${camel.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-stream</artifactId>
       <version>${camel.version}</version>
     </dependency>
     
@@ -97,7 +100,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
-      <artifactId>camel-test</artifactId>
+      <artifactId>camel-test-spring</artifactId>
       <version>${camel.version}</version>
     </dependency>
   </dependencies>
