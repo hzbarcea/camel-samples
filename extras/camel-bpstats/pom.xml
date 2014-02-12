@@ -22,23 +22,29 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.example.camel.digi</groupId>
-  <artifactId>camel-digi</artifactId>
+  <groupId>org.example.camel</groupId>
+  <artifactId>camel-bpstats</artifactId>
   <packaging>jar</packaging>
   <version>1.0.0</version>
 
   <name>A Camel Route</name>
-  <url>http://coders.talend.com</url>
+  <url>http://camel.apache.org</url>
 
   <properties>
-    <camel.version>2.8.2</camel.version>
-    <spring.version>3.0.6.RELEASE</spring.version>
+    <camel.version>2.12.2</camel.version>
+    <spring.version>3.2.5.RELEASE</spring.version>
+    <geronimo-jpa-spec.version>1.1.1</geronimo-jpa-spec.version>
+    <geronimo-jta-spec.version>1.1.1</geronimo-jta-spec.version>
+    
+    <log4j.version>1.2.17</log4j.version>
+    <slf4j-api.version>1.6.6</slf4j-api.version>
+    <slf4j.version>1.7.5</slf4j.version>
 
-    <log4j.version>1.2.16</log4j.version>
-    <slf4j.version>1.6.1</slf4j.version>
-    <junit.version>4.8.1</junit.version>
+    <junit.version>4.11</junit.version>
+    <derby.version>10.10.1.1</derby.version>
+    <hibernate.version>4.2.7.Final</hibernate.version>
 
-    <maven-bundle-version>2.3.5</maven-bundle-version>
+    <maven-bundle.version>2.3.5</maven-bundle.version>
   </properties>
 
 
@@ -55,7 +61,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
-      <artifactId>camel-netty</artifactId>
+      <artifactId>camel-bam</artifactId>
       <version>${camel.version}</version>
     </dependency>
     
@@ -64,12 +70,27 @@
       <artifactId>spring-context</artifactId>
       <version>${spring.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-orm</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.geronimo.specs</groupId>
+      <artifactId>geronimo-jpa_3.0_spec</artifactId>
+      <version>${geronimo-jpa-spec.version}</version>
+    </dependency>
 
     <!-- logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version> 
+      <version>${slf4j-api.version}</version> 
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -99,6 +120,13 @@
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-test</artifactId>
       <version>${camel.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-test-spring</artifactId>
+      <version>${camel.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -120,8 +148,46 @@
       <plugin>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-maven-plugin</artifactId>
-        <version>2.8.2</version>
+        <version>${camel.version}</version>
       </plugin>
     </plugins>
   </build>
+  
+  <profiles>
+    <!--  Hibernate Derby profile -->
+    <profile>
+      <id>hibernate-derby</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <!-- build>
+        <testResources>
+          <testResource>
+            <directory>${basedir}/src/test/resources/profiles/derby</directory>
+          </testResource>
+        </testResources>
+      </build -->
+      <dependencies>
+        <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-entitymanager</artifactId>
+          <version>${hibernate.version}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.derby</groupId>
+          <artifactId>derby</artifactId>
+          <version>${derby.version}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.geronimo.specs</groupId>
+          <artifactId>geronimo-jta_1.1_spec</artifactId>
+          <version>${geronimo-jta-spec.version}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
+
 </project>
