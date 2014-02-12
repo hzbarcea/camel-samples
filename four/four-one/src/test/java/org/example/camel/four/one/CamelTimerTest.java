@@ -1,4 +1,4 @@
-package org.example.camel.five.one;
+package org.example.camel.four.one;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -14,8 +14,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CamelEipTimerTest extends CamelTestSupport {
-    static final transient Logger LOG = LoggerFactory.getLogger(CamelEipTimerTest.class);
+public class CamelTimerTest extends CamelTestSupport {
+    static final transient Logger LOG = LoggerFactory.getLogger(CamelTimerTest.class);
 
     @Test
     public void testTimer() throws Exception {

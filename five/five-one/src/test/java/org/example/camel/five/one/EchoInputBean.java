@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EchoInputBean {
-    static final transient Logger LOG = LoggerFactory.getLogger(CamelEipTimerTest.class);
+    static final transient Logger LOG = LoggerFactory.getLogger(EchoInputBean.class);
     private String prefix;
 
     public EchoInputBean() {
@@ -17,6 +17,6 @@ public class EchoInputBean {
     }
     
     public void echo(@Body String body) {
-        CamelEipTimerTest.LOG.info(prefix + body);
+        LOG.info(prefix + body);
     }
 }
