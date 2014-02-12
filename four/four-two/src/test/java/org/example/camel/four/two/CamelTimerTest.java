@@ -1,4 +1,4 @@
-package org.example.camel.four.one;
+package org.example.camel.four.two;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

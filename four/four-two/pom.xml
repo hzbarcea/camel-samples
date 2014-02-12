@@ -29,9 +29,9 @@
     <version>1.0.0</version>
   </parent>
 
-  <artifactId>four-one</artifactId>
+  <artifactId>four-two</artifactId>
   <packaging>jar</packaging>
-  <name>Camel :: Examples :: Four-One</name>
+  <name>Camel :: Examples :: Four-Two</name>
 
   <dependencies>
     <dependency>
