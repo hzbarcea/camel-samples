@@ -21,52 +21,52 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class BlockInputStream extends BufferedInputStream {
-	private final long blockSize;
-	private final int index;
-	private boolean advance = true;
+    private final long blockSize;
+    private final int index;
+    private boolean advance = true;
 
-	public BlockInputStream(InputStream in, long blockSize, int index) {
-		super(in);
-		this.blockSize = blockSize;
-		this.index = index;
-	}
+    public BlockInputStream(InputStream in, long blockSize, int index) {
+        super(in);
+        this.blockSize = blockSize;
+        this.index = index;
+    }
 
-	public BlockInputStream(InputStream in, int size, long blockSize, int index) {
-		super(in, size);
-		this.blockSize = blockSize;
-		this.index = index;
-	}
+    public BlockInputStream(InputStream in, int size, long blockSize, int index) {
+        super(in, size);
+        this.blockSize = blockSize;
+        this.index = index;
+    }
 
-	public int getIndex() {
-		return index;
-	}
+    public int getIndex() {
+        return index;
+    }
 
-	public long getBlockSize() {
-		return blockSize;
-	}
+    public long getBlockSize() {
+        return blockSize;
+    }
 
-	@Override
-	public synchronized int read() throws IOException {
-		step();
-		return super.read();
-	}
+    @Override
+    public synchronized int read() throws IOException {
+        step();
+        return super.read();
+    }
 
-	@Override
-	public synchronized int read(byte[] b, int off, int len) throws IOException {
-		step();
-		return super.read(b, off, len);
-	}
+    @Override
+    public synchronized int read(byte[] b, int off, int len) throws IOException {
+        step();
+        return super.read(b, off, len);
+    }
 
-	@Override
-	public int read(byte[] b) throws IOException {
-		step();
-		return super.read(b);
-	}
+    @Override
+    public int read(byte[] b) throws IOException {
+        step();
+        return super.read(b);
+    }
 
-	private synchronized void step() throws IOException {
-		if (advance) {
-			this.skip(blockSize * index);
-			advance = false;
-		}
-	}
+    private synchronized void step() throws IOException {
+        if (advance) {
+            this.skip(blockSize * index);
+            advance = false;
+        }
+    }
 }

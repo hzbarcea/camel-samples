@@ -37,14 +37,14 @@ public class CamelEipDynamicRouterTest extends CamelTestSupport {
             @Override
             public void configure() throws Exception {
                 from("direct:recipient-list")
-	                .recipientList(header("sendTo"))
-	                .to("mock:result");
+                    .recipientList(header("sendTo"))
+                    .to("mock:result");
 
                 from("direct:routing-slip")
                     .choice()
-                    	.when(body().startsWith("Hello")).routingSlip(constant("direct:non-latin,direct:english")).end()
-                    	.when(body().startsWith("Bonjour")).routingSlip(constant("direct:french")).end()
-                    	.otherwise().routingSlip(constant("direct:non-latin,direct:german")).end();
+                        .when(body().startsWith("Hello")).routingSlip(constant("direct:non-latin,direct:english")).end()
+                        .when(body().startsWith("Bonjour")).routingSlip(constant("direct:french")).end()
+                        .otherwise().routingSlip(constant("direct:non-latin,direct:german")).end();
 
                 from("direct:non-latin").to("log:non-latin").to("mock:non-latin");
                 from("direct:english").to("log:english").to("mock:english");

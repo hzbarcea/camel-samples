@@ -5,11 +5,11 @@ public class Individual {
     public int weight;
 
     public Individual(String fullName, int weight) {
-    	this.fullName = fullName;
-    	this.weight = weight;
+        this.fullName = fullName;
+        this.weight = weight;
     }
     
     public String toString() {
-    	return fullName + " [" + weight + "]";
+        return fullName + " [" + weight + "]";
     }
 }

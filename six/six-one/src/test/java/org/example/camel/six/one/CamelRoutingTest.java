@@ -48,16 +48,16 @@ public class CamelRoutingTest extends CamelTestSupport {
             public void configure() throws Exception {
                 from("direct:start")
                     .to("bean:myBean?method=secondMethod")
-            		.beanRef("myBean", "firstMethod")
-            		.to("log:camel-example")
-                	.log(LoggingLevel.WARN, "camel-log", "Processing message with id='${header.id}' body='${body}'")
-            		.to("mock:result");
+                    .beanRef("myBean", "firstMethod")
+                    .to("log:camel-example")
+                    .log(LoggingLevel.WARN, "camel-log", "Processing message with id='${header.id}' body='${body}'")
+                    .to("mock:result");
 
                 from("direct:convert")
-                	// .convertBodyTo(Individual.class)
-                	.beanRef("fitness")
-                	.to("log:camel-convert")
-	        		.to("mock:result");
+                    // .convertBodyTo(Individual.class)
+                    .beanRef("fitness")
+                    .to("log:camel-convert")
+                    .to("mock:result");
             }
         };
     }

@@ -19,7 +19,7 @@ public class CamelEipTimerTest extends CamelTestSupport {
 
     @Test
     public void testTimer() throws Exception {
-    	int expected = 10;
+        int expected = 10;
         MockEndpoint mock = getMockEndpoint("mock:result");
         mock.expectedMinimumMessageCount(expected);
 
@@ -33,10 +33,10 @@ public class CamelEipTimerTest extends CamelTestSupport {
         return new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-            	from("direct:foo")
-            	    .to("log:FOO?showBody=false&showBodyType=true&showHeaders=true")
-            		.to("myBean", "bodyAndHeader")
-            		.to("mock:result");
+                from("timer:foo")
+                    .to("log:FOO?showBody=false&showBodyType=true&showHeaders=true")
+                    .beanRef("myBean", "bodyAndHeader")
+                    .to("mock:result");
             }
         };
     }

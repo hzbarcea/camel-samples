@@ -1,6 +1,5 @@
 package org.example.camel.five.one;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -8,13 +7,13 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Predicate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.apache.camel.impl.JndiRegistry;
-import org.apache.camel.processor.aggregate.AggregationStrategy;
 import org.apache.camel.test.junit4.CamelTestSupport;
 import org.junit.Test;
 
+
 public class CamelEipSplitAggregateTest extends CamelTestSupport {
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testSplitAndAggregate() throws Exception {
         MockEndpoint result = getMockEndpoint("mock:result");
@@ -42,7 +41,7 @@ public class CamelEipSplitAggregateTest extends CamelTestSupport {
         TouristTrap first = group.get(0).getIn().getBody(TouristTrap.class);
         TouristTrap second = group.get(1).getIn().getBody(TouristTrap.class);
         assertTrue((first.name == "Aruba" && second.name == "Cancun") 
-        		|| (first.name == "Cancun" && second.name == "Aruba"));
+                || (first.name == "Cancun" && second.name == "Aruba"));
     }
 
     @Override
@@ -50,25 +49,25 @@ public class CamelEipSplitAggregateTest extends CamelTestSupport {
         return new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-            	getContext().setTracing(true);
-            	
+                getContext().setTracing(true);
+                
                 from("direct:start")
-	                .split().body()
-	                .to("log:splitter")
-	                .to("mock:result")
+                    .split().body()
+                    .to("log:splitter")
+                    .to("mock:result")
                     .to("seda:travel");
                 
                 from("seda:travel")
-                	.filter(new Predicate() {
-						@Override
-						public boolean matches(Exchange exchange) {
-							TouristTrap body = exchange.getIn().getBody(TouristTrap.class);
-							return body.museums == 0;
-						}
-                	})
-                	.aggregate(constant(true)).completionSize(2).completionInterval(1000L).groupExchanges()
-                	.to("log:vacation-time")
-                	.to("mock:vacation");
+                    .filter(new Predicate() {
+                        @Override
+                        public boolean matches(Exchange exchange) {
+                            TouristTrap body = exchange.getIn().getBody(TouristTrap.class);
+                            return body.museums == 0;
+                        }
+                    })
+                    .aggregate(constant(true)).completionSize(2).completionInterval(1000L).groupExchanges()
+                    .to("log:vacation-time")
+                    .to("mock:vacation");
             }
         };
     }
@@ -86,8 +85,8 @@ public class CamelEipSplitAggregateTest extends CamelTestSupport {
 
         @Override
         public String toString() {
-        	return "Destination " + name + " ranked #" + rank 
-        		+ (museums > 0 ? " featuring " + museums + " fine museums" : "");
+            return "Destination " + name + " ranked #" + rank 
+                + (museums > 0 ? " featuring " + museums + " fine museums" : "");
         }
     }
 }

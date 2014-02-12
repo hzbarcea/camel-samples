@@ -29,12 +29,12 @@ public class CamelEipFilterTest extends CamelTestSupport {
         return new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-            	getContext().setTracing(true);
-            	
+                getContext().setTracing(true);
+                
                 from("direct:start")
-	                .filter(header("rank").isGreaterThan("3"))
-	                .to("log:interesting")
-	                .to("mock:result");
+                    .filter(header("rank").isGreaterThan("3"))
+                    .to("log:interesting")
+                    .to("mock:result");
             }
         };
     }

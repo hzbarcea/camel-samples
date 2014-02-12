@@ -25,85 +25,85 @@ import org.apache.camel.Expression;
 import org.apache.camel.builder.RouteBuilder;
 
 public class FileSplitRouteBuilder extends RouteBuilder {
-	private static final int BLOCK_SIZE = 512;
-	private static final int READER_COUNT = 4;
-	private static final int WORKER_COUNT = 8;
-	private static final String READER_URI = "seda:reader";
-	private static final String WORKER_URI = "seda:worker";
+    private static final int BLOCK_SIZE = 512;
+    private static final int READER_COUNT = 4;
+    private static final int WORKER_COUNT = 8;
+    private static final String READER_URI = "seda:reader";
+    private static final String WORKER_URI = "seda:worker";
 
     @Override
     public void configure() throws Exception {
-    	getContext().setTracing(false);
+        getContext().setTracing(false);
 
         from("{{demo.source}}").routeId("fetch").autoStartup(false)
             .split(FileSplitter.blocks(BLOCK_SIZE)).parallelProcessing()
                 .loadBalance().roundRobin().to(READER_URI);
 
-    	from(READER_URI + "?concurrentConsumers=" + READER_COUNT)
-		    .convertBodyTo(InputStream.class)
-		    // feel free to comment out following line to reduce noise in the log
-		    .to("log:org.example.camel.READER?showBody=false&showExchangePattern=false")
-	        .split(perBlock(body().tokenize("\n")))
-	            .loadBalance().roundRobin().to(WORKER_URI);
+        from(READER_URI + "?concurrentConsumers=" + READER_COUNT)
+            .convertBodyTo(InputStream.class)
+            // feel free to comment out following line to reduce noise in the log
+            .to("log:org.example.camel.READER?showBody=false&showExchangePattern=false")
+            .split(perBlock(body().tokenize("\n")))
+                .loadBalance().roundRobin().to(WORKER_URI);
 
-    	from(WORKER_URI + "?concurrentConsumers=" + WORKER_COUNT)
-		    // feel free to comment out following line to reduce noise in the log
-		    .to("log:org.example.camel.WORKER?showBodyType=false&showExchangePattern=false")
-		    .processRef("splitCounter");
+        from(WORKER_URI + "?concurrentConsumers=" + WORKER_COUNT)
+            // feel free to comment out following line to reduce noise in the log
+            .to("log:org.example.camel.WORKER?showBodyType=false&showExchangePattern=false")
+            .processRef("splitCounter");
     }
 
     private static Expression perBlock(final Expression inner) {
-    	return new Expression() {
+        return new Expression() {
             @SuppressWarnings("unchecked")
-			public <T> T evaluate(Exchange exchange, Class<T> type) {
+            public <T> T evaluate(Exchange exchange, Class<T> type) {
                 T result = inner.evaluate(exchange, type);
                 Object input = exchange.getIn().getBody();
                 if (result instanceof Scanner && input instanceof BlockInputStream) {
-                	BlockInputStream body = (BlockInputStream)input;
-                	Scanner s = (Scanner)result;
-                	result = (T)new BlockSplitIterator(s, body.getBlockSize(), body.getIndex() > 0);
+                    BlockInputStream body = (BlockInputStream)input;
+                    Scanner s = (Scanner)result;
+                    result = (T)new BlockSplitIterator(s, body.getBlockSize(), body.getIndex() > 0);
                 }
                 return result;
             }
-    	};
+        };
     }
 
     public static class BlockSplitIterator implements Iterator<String> {
-    	Scanner scanner;
-    	boolean skip;
-    	long blockSize;
-    	long count;
+        Scanner scanner;
+        boolean skip;
+        long blockSize;
+        long count;
 
-    	public BlockSplitIterator(Scanner scanner, long blockSize, boolean skipFirst) {
-    		this.scanner = scanner;
-    		this.skip = skipFirst;
-    		this.blockSize = blockSize;
-    		count = 0;
-    	}
+        public BlockSplitIterator(Scanner scanner, long blockSize, boolean skipFirst) {
+            this.scanner = scanner;
+            this.skip = skipFirst;
+            this.blockSize = blockSize;
+            count = 0;
+        }
 
-    	@Override
-		public boolean hasNext() {
-    		if (count > blockSize) {
-    			return false;
-    		}
-    		boolean result = scanner.hasNext();
-    		if (result && skip) {
-    			skip = false;
-    			next();
-    			result = hasNext();
-    		}
-			return result;
-		}
-		@Override
-		public String next() {
-			String result = scanner.next();
-			count += result.length() + 1;
-			return result;
-		}
-		@Override
-		public void remove() {
-			// this may break the whole logic
-			scanner.remove();
-		}
+        @Override
+        public boolean hasNext() {
+            if (count > blockSize) {
+                return false;
+            }
+            boolean result = scanner.hasNext();
+            if (result && skip) {
+                skip = false;
+                next();
+                result = hasNext();
+            }
+            return result;
+        }
+        @Override
+        public String next() {
+            String result = scanner.next();
+            count += result.length() + 1;
+            return result;
+        }
+        @Override
+        public void remove() {
+            // this may break the whole logic
+            scanner.remove();
+        }
     }
 }

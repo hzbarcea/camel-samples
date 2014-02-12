@@ -21,14 +21,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DigiRequest {
-	public static final String REQUEST = "C0 80 05 00 54 72 C0 C0 80 05 00 54 72 C0";
+    public static final String REQUEST = "C0 80 05 00 54 72 C0 C0 80 05 00 54 72 C0";
     private static final Logger LOG = LoggerFactory.getLogger(DigiRequest.class);
 
-	public String prepare(@Header(value = "DigiId") String id) {
-    	// We can use the id to prepare a personalized request
-    	// ... but hardcode for now, per 'requirements'
-		String request = REQUEST;
-		LOG.info("Prepared request for digi id='{}' with value='{}'", id, request);
-    	return request;
+    public String prepare(@Header(value = "DigiId") String id) {
+        // We can use the id to prepare a personalized request
+        // ... but hardcode for now, per 'requirements'
+        String request = REQUEST;
+        LOG.info("Prepared request for digi id='{}' with value='{}'", id, request);
+        return request;
     }
 }

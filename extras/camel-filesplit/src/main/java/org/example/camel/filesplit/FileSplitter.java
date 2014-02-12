@@ -39,79 +39,79 @@ import org.apache.camel.util.ObjectHelper;
 
 @Converter
 public final class FileSplitter {
-	public static final String CHUNK_INDEX = "SplitterChunkIndex";
-	public static final String SEQUENCE_INDEX = "SplitterSequenceIndex";
-	public static final String SEQUENCE_LAST = "SplitterSequenceLast";
-	public static final Message EMPTY_MESSAGE = new DefaultMessage();
+    public static final String CHUNK_INDEX = "SplitterChunkIndex";
+    public static final String SEQUENCE_INDEX = "SplitterSequenceIndex";
+    public static final String SEQUENCE_LAST = "SplitterSequenceLast";
+    public static final Message EMPTY_MESSAGE = new DefaultMessage();
 
-	public static Expression nullBody() {
-		return new Expression()  {
-			@Override
-			public <T> T evaluate(Exchange exchange, Class<T> type) {
-				return (T)null;
-			}
-	    };
-	}
-
-	public static Expression blocks(final long blockSize) {
-		return new Expression()  {
-			@Override
-			@SuppressWarnings("unchecked")
-			public <T> T evaluate(Exchange exchange, Class<T> type) {
-				if (type.isAssignableFrom(List.class) && exchange.getIn().getBody() instanceof GenericFile) {
-					GenericFile<?> input = (GenericFile<?>)exchange.getIn().getBody();
-					long size = input.getFileLength();
-					int count = (int)((size + blockSize - 1) / blockSize);
-					List<FileBlock> answer = new ArrayList<FileBlock>(count);
-					for (int i = 0; i < count; i++) {
-						answer.add(new FileBlock(input, blockSize, i));
-					}
-				    return (T)answer;
-				}
-				return null;
-		    }
-		};
-	}
-
-	public static Processor delayLine(final int length) {
-		return new Processor() {
-			private Queue<Message> queue = new LinkedList<Message>();
-			private int index = 0;
-
-			@Override
-			public void process(Exchange exchange) throws Exception {
-				queue.add(exchange.getIn());
-
-				Message out = length < queue.size() ? queue.poll() : EMPTY_MESSAGE;
-				if (out.getBody() != null) {
-					out.setHeader(SEQUENCE_INDEX, index++);
-					Message prev = queue.size() > 0 ? queue.peek() : EMPTY_MESSAGE;
-					out.setHeader(SEQUENCE_LAST, prev.getBody() == null);
-				} else {
-					index = 0;
-				}
-				exchange.setOut(out);
-			}
-		};
-	}
-
-	public static Predicate notEmpty() { 
-	    return new Predicate() {
-			@Override
-			public boolean matches(Exchange exchange) {
-				Integer index = exchange.getIn().getHeader(SEQUENCE_INDEX, Integer.class);
-				return exchange.getIn().getBody() != null && index != 0;
-			}
-	    };
+    public static Expression nullBody() {
+        return new Expression()  {
+            @Override
+            public <T> T evaluate(Exchange exchange, Class<T> type) {
+                return (T)null;
+            }
+        };
     }
 
-	@Converter
-	public static InputStream toInputStream(FileBlock block, Exchange exchange) throws IOException, CamelException {
+    public static Expression blocks(final long blockSize) {
+        return new Expression()  {
+            @Override
+            @SuppressWarnings("unchecked")
+            public <T> T evaluate(Exchange exchange, Class<T> type) {
+                if (type.isAssignableFrom(List.class) && exchange.getIn().getBody() instanceof GenericFile) {
+                    GenericFile<?> input = (GenericFile<?>)exchange.getIn().getBody();
+                    long size = input.getFileLength();
+                    int count = (int)((size + blockSize - 1) / blockSize);
+                    List<FileBlock> answer = new ArrayList<FileBlock>(count);
+                    for (int i = 0; i < count; i++) {
+                        answer.add(new FileBlock(input, blockSize, i));
+                    }
+                    return (T)answer;
+                }
+                return null;
+            }
+        };
+    }
+
+    public static Processor delayLine(final int length) {
+        return new Processor() {
+            private Queue<Message> queue = new LinkedList<Message>();
+            private int index = 0;
+
+            @Override
+            public void process(Exchange exchange) throws Exception {
+                queue.add(exchange.getIn());
+
+                Message out = length < queue.size() ? queue.poll() : EMPTY_MESSAGE;
+                if (out.getBody() != null) {
+                    out.setHeader(SEQUENCE_INDEX, index++);
+                    Message prev = queue.size() > 0 ? queue.peek() : EMPTY_MESSAGE;
+                    out.setHeader(SEQUENCE_LAST, prev.getBody() == null);
+                } else {
+                    index = 0;
+                }
+                exchange.setOut(out);
+            }
+        };
+    }
+
+    public static Predicate notEmpty() { 
+        return new Predicate() {
+            @Override
+            public boolean matches(Exchange exchange) {
+                Integer index = exchange.getIn().getHeader(SEQUENCE_INDEX, Integer.class);
+                return exchange.getIn().getBody() != null && index != 0;
+            }
+        };
+    }
+
+    @Converter
+    public static InputStream toInputStream(FileBlock block, Exchange exchange) throws IOException, CamelException {
         if (block.getFile().getFile() instanceof java.io.File) {
-        	ObjectHelper.notNull(exchange, "Exchange");
-        	exchange.getIn().setHeader(CHUNK_INDEX, block.getIndex());
+            ObjectHelper.notNull(exchange, "Exchange");
+            exchange.getIn().setHeader(CHUNK_INDEX, block.getIndex());
             return new BlockInputStream(new FileInputStream((File)block.getFile().getFile()), block.getChunk(), block.getIndex());
         }
         return GenericFileConverter.genericFileToInputStream(block.getFile(), exchange);
-	}
+    }
 }

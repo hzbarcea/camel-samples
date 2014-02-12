@@ -9,11 +9,11 @@ public class EchoInputBean {
     private String prefix;
 
     public EchoInputBean() {
-    	this("ECHO");
+        this("ECHO");
     }
     
     public EchoInputBean(String prefix) {
-    	this.prefix = "[" + (prefix != null ? prefix : "?") + "] ";
+        this.prefix = "[" + (prefix != null ? prefix : "?") + "] ";
     }
     
     public void echo(@Body String body) {

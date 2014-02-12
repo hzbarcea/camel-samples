@@ -17,7 +17,7 @@ public class CamelBeanWithArgumentTest extends CamelTestSupport {
 
     @Test
     public void testTimer() throws Exception {
-    	int expected = 10;
+        int expected = 10;
         MockEndpoint mock = getMockEndpoint("mock:result");
         mock.expectedMinimumMessageCount(expected);
 
@@ -31,9 +31,9 @@ public class CamelBeanWithArgumentTest extends CamelTestSupport {
         return new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-            	from("timer://eip?fixedRate=true&delay=0&period=500")
-            		.beanRef("myBean", "firstMethod")
-            		.to("mock:result");
+                from("timer://eip?fixedRate=true&delay=0&period=500")
+                    .beanRef("myBean", "firstMethod")
+                    .to("mock:result");
             }
         };
     }

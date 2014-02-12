@@ -37,9 +37,9 @@ public class BusinessProcessStatsTest extends CamelSpringTestSupport{
         template.sendBody("direct:bank", "<operation ref='C-0001' type='credit'><account>camel.001</account><amount>100.00</amount></operation>");
         this.assertMockEndpointsSatisfied();
 
-    	ActivityState state = o.getExchanges().get(0).getIn().getBody(ActivityState.class);
-    	assertNotNull(state);
-    	assertEquals("office", state.getActivityDefinition().getName());
+        ActivityState state = o.getExchanges().get(0).getIn().getBody(ActivityState.class);
+        assertNotNull(state);
+        assertEquals("office", state.getActivityDefinition().getName());
     }
 
     @Test

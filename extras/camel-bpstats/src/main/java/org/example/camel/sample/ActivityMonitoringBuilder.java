@@ -31,7 +31,7 @@ public class ActivityMonitoringBuilder extends ProcessBuilder {
     }
 
     public ActivityMonitoringBuilder(JpaTemplate jpaTemplate, TransactionTemplate transactionTemplate) {
-    	super(jpaTemplate, transactionTemplate);
+        super(jpaTemplate, transactionTemplate);
     }
 
     @Override

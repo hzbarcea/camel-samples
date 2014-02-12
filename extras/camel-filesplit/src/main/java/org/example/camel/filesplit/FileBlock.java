@@ -19,25 +19,25 @@ package org.example.camel.filesplit;
 import org.apache.camel.component.file.GenericFile;
 
 public class FileBlock {
-	private final GenericFile<?> file;
-	private final long size;
-	private final int index;
+    private final GenericFile<?> file;
+    private final long size;
+    private final int index;
 
-	public FileBlock(GenericFile<?> file, long size, int index) {
-		this.file = file;
-		this.size = size;
-		this.index = index;
-	}
+    public FileBlock(GenericFile<?> file, long size, int index) {
+        this.file = file;
+        this.size = size;
+        this.index = index;
+    }
 
-	public GenericFile<?> getFile() {
-		return file;
-	}
+    public GenericFile<?> getFile() {
+        return file;
+    }
 
-	public long getChunk() {
-		return size;
-	}
+    public long getChunk() {
+        return size;
+    }
 
-	public int getIndex() {
-		return index;
-	}
+    public int getIndex() {
+        return index;
+    }
 }

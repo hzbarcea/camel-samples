@@ -15,15 +15,15 @@ public class CamelEipConsumersTest extends CamelTestSupport {
     private IdempotentRepository<String> store;
 
     @Override
-	public void setUp() throws Exception {
+    public void setUp() throws Exception {
         store = MemoryIdempotentRepository.memoryIdempotentRepository();
         LOG.info("Created MemoryIdempotentRepository");
         super.setUp();
     }
     
     @Override
-	public void tearDown() throws Exception {
-    	super.tearDown();
+    public void tearDown() throws Exception {
+        super.tearDown();
         LOG.info("Destroying MemoryIdempotentRepository");
         store = null;
     }
@@ -62,11 +62,11 @@ public class CamelEipConsumersTest extends CamelTestSupport {
             @Override
             public void configure() throws Exception {
                 from("direct:start").routeId("camel-webinar")
-                	.to("log:big-brother").to("mock:result");
+                    .to("log:big-brother").to("mock:result");
                 
                 from("direct:idempotent").idempotentConsumer(header("id"), store)
-                	.log(LoggingLevel.INFO, "big-brother", "Processing message with id='${header.id}' body='${body}'")
-                	.to("mock:result");
+                    .log(LoggingLevel.INFO, "big-brother", "Processing message with id='${header.id}' body='${body}'")
+                    .to("mock:result");
             }
         };
     }

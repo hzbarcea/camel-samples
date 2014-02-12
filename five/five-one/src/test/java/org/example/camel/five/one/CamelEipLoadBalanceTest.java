@@ -12,13 +12,13 @@ public class CamelEipLoadBalanceTest extends CamelTestSupport {
 
     @Test
     public void testRoundRobin() throws Exception {
-    	int expected = 10;
+        int expected = 10;
         send("direct:round-robin", expected);
     }
 
     @Test
     public void testRandom() throws Exception {
-    	int expected = 10;
+        int expected = 10;
         send("direct:random", expected);
     }
     
@@ -38,23 +38,23 @@ public class CamelEipLoadBalanceTest extends CamelTestSupport {
         return new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-            	getContext().setTracing(true);
-            	
+                getContext().setTracing(true);
+                
                 from("direct:round-robin")
-	                .loadBalance().roundRobin()
-	                    .to("seda:one")
-	                    .to("seda:two")
-	                    .to("seda:three")
-	                .end()
-	                .to("mock:result");
+                    .loadBalance().roundRobin()
+                        .to("seda:one")
+                        .to("seda:two")
+                        .to("seda:three")
+                    .end()
+                    .to("mock:result");
                 
                 from("direct:random")
-	                .loadBalance().random()
-	                    .to("seda:one")
-	                    .to("seda:two")
-	                    .to("seda:three")
-	                .end()
-	                .to("mock:result");
+                    .loadBalance().random()
+                        .to("seda:one")
+                        .to("seda:two")
+                        .to("seda:three")
+                    .end()
+                    .to("mock:result");
                 
                 from("seda:one").to("log:ONE");
                 from("seda:two").to("log:TWO");

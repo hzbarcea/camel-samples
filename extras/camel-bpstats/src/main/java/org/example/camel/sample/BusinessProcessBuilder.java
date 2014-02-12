@@ -39,23 +39,23 @@ public class BusinessProcessBuilder extends RouteBuilder {
         from("direct:errors")
             // could do any processing we want here, say escalate if some condition is met
             .process(new Processor() {
-				@Override
-				public void process(Exchange exchange) throws Exception {
-					String header = (String) exchange.getIn().getHeader("SampleRef");
-					if (header != null && header.endsWith("007")) {
-						LOG.warn("Activity on James Bond accounts gets reported to MI6");
-					}
-				}
+                @Override
+                public void process(Exchange exchange) throws Exception {
+                    String header = (String) exchange.getIn().getHeader("SampleRef");
+                    if (header != null && header.endsWith("007")) {
+                        LOG.warn("Activity on James Bond accounts gets reported to MI6");
+                    }
+                }
             })
             .to("direct:monitor-errors"); 
 
-    	from("direct:bank")
-    	    .onException(PredicateValidationException.class).handled(true).maximumRedeliveries(0).to("direct:errors").end()
+        from("direct:bank")
+            .onException(PredicateValidationException.class).handled(true).maximumRedeliveries(0).to("direct:errors").end()
             .to("direct:monitor-teller")
             .setHeader("SampleRef", ns.xpath("/operation/@ref", String.class))
-    	    .validate(header("SampleRef").startsWith("C-"))
-    	    .delay(3000)
-    	    .to("log:BANK")
-	        .to("direct:monitor-office");
+            .validate(header("SampleRef").startsWith("C-"))
+            .delay(3000)
+            .to("log:BANK")
+            .to("direct:monitor-office");
     }
 }

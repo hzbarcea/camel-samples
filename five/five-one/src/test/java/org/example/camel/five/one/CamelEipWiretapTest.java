@@ -12,7 +12,7 @@ public class CamelEipWiretapTest extends CamelTestSupport {
 
     @Test
     public void testWiretap() throws Exception {
-    	int expected = 2;
+        int expected = 2;
         MockEndpoint mock = getMockEndpoint("mock:result");
         mock.expectedMessageCount(expected);
 
@@ -27,18 +27,18 @@ public class CamelEipWiretapTest extends CamelTestSupport {
         return new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-            	getContext().setTracing(true);
-            	
+                getContext().setTracing(true);
+                
                 from("direct:start")
-	                .wireTap("seda:wiretap")
-	                .to("bean:foo")
-	                .to("mock:result");
+                    .wireTap("seda:wiretap")
+                    .to("bean:foo")
+                    .to("mock:result");
 
                 from("seda:wiretap")
-	                .delay(3000).setBody().simple("${in.body} again...")
-	                .to("bean:bar?method=echo")
-                	.to("mock:wiretap")
-                	.to("mock:result");
+                    .delay(3000).setBody().simple("${in.body} again...")
+                    .to("bean:bar?method=echo")
+                    .to("mock:wiretap")
+                    .to("mock:result");
             }
         };
     }

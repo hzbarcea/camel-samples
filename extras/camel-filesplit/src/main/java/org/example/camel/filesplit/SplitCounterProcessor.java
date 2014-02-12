@@ -26,45 +26,45 @@ import org.apache.camel.support.ServiceSupport;
 
 
 public final class SplitCounterProcessor extends ServiceSupport implements Processor, CamelContextAware {
-	private CamelContext context;
-	private CountDownLatch counter;
-	private long timeStarted = 0;
+    private CamelContext context;
+    private CountDownLatch counter;
+    private long timeStarted = 0;
 
-	@Override
-	public void setCamelContext(CamelContext camelContext) {
-		this.context = camelContext;
-	}
+    @Override
+    public void setCamelContext(CamelContext camelContext) {
+        this.context = camelContext;
+    }
 
-	@Override
-	public CamelContext getCamelContext() {
-		return context;
-	}
+    @Override
+    public CamelContext getCamelContext() {
+        return context;
+    }
 
-	@Override
-	public void process(Exchange exchange) throws Exception {
-		if (counter != null) {
-		    counter.countDown();
-		}
-	}
+    @Override
+    public void process(Exchange exchange) throws Exception {
+        if (counter != null) {
+            counter.countDown();
+        }
+    }
 
-	@Override
-	protected void doStart() throws Exception {
-		timeStarted = System.currentTimeMillis();
-	}
+    @Override
+    protected void doStart() throws Exception {
+        timeStarted = System.currentTimeMillis();
+    }
 
-	@Override
-	protected void doStop() throws Exception {
-	}
+    @Override
+    protected void doStop() throws Exception {
+    }
 
-	public CountDownLatch getCounter() {
-		return counter;
-	}
+    public CountDownLatch getCounter() {
+        return counter;
+    }
 
-	public void setCounter(CountDownLatch counter) {
-		this.counter = counter;
-	}
+    public void setCounter(CountDownLatch counter) {
+        this.counter = counter;
+    }
 
-	public long getTimeStarted() {
-		return timeStarted;
-	}
+    public long getTimeStarted() {
+        return timeStarted;
+    }
 }

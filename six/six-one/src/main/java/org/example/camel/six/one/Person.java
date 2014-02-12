@@ -6,12 +6,12 @@ public class Person {
     public int age;
 
     public Person(String first, String last, int age) {
-    	firstName = first;
-    	lastName = last;
-    	this.age = age;
+        firstName = first;
+        lastName = last;
+        this.age = age;
     }
     
     public String toString() {
-    	return firstName + " " + lastName + " (" + age + ")";
+        return firstName + " " + lastName + " (" + age + ")";
     }
 }
