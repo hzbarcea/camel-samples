@@ -19,7 +19,7 @@ public class CamelTimerTest extends CamelTestSupport {
 
     @Test
     public void testTimer() throws Exception {
-        int expected = 10;
+        int expected = 8;
         MockEndpoint mock = getMockEndpoint("mock:result");
         mock.expectedMinimumMessageCount(expected);
 
