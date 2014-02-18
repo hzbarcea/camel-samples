@@ -1,0 +1,3 @@
+My name is ${body.lname}, ${body.fname} ${body.lname}
+I am agent ${body.id}
+I report to ${body.manager} and I drive a ${body.vehicle}.
