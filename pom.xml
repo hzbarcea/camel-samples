@@ -63,6 +63,7 @@
     <module>four</module>
     <module>five</module>
     <module>six</module>
+    <module>eight</module>
   </modules>
 
   <dependencyManagement>
